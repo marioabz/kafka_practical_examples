@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+
+  kafka_broker_ctlr:
+    image: bitnami/kafka:latest
+    hostname: kafka_broker_ctlr
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_KRAFT_CLUSTER_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:${BROKER_PORT},CONTROLLER://:${CONTROLLER_PORT},
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_broker_ctlr:${BROKER_PORT},
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka_broker_ctlr:${CONTROLLER_PORT}
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    ports:
+      - ${BROKER_PORT}
+  
+  producer:
+    build:
+      context:
+        ./
+    volumes:
+      - ./:/kafka_ex/
+    env_file: .env
+    command: >
+      bash -c "sleep 10 && python app/producer.py"
+    depends_on:
+      - kafka_broker_ctlr

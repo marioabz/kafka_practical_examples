@@ -17,6 +17,18 @@ services:
     ports:
       - ${BROKER_PORT}
   
+  consumer:
+    build:
+      context:
+        ./
+    volumes:
+      - ./:/kafka_ex/
+    env_file: .env
+    command: >
+      bash -c "sleep 5 && python app/consumer.py"
+    depends_on:
+      - kafka_broker_ctlr
+
   producer:
     build:
       context:
@@ -28,3 +40,4 @@ services:
       bash -c "sleep 10 && python app/producer.py"
     depends_on:
       - kafka_broker_ctlr
+      - consumer

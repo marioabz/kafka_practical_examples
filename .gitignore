@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-./compose.yml
+compose.yml
 
 # C extensions
 *.so
